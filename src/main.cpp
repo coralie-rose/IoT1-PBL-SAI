@@ -90,11 +90,20 @@ void setup() {
     display.setCursor(0, 0);
     display.println("Room status");
     display.drawLine(0, 10, 127, 10, SSD1306_WHITE);
+    display.setCursor(0, 16);
     display.println("Initializing...");
     display.display();
 }
 
 void loop() {
+    // Wait until we have the first 10 readings before printing to OLED
+    // Otherwise average temp. printed is inaccurate (takes 20s)
+    while (temp_readings[9] == 0) {
+        if (millis() - lastTempReadTime >= tempReadInterval) {
+            readTemp();
+        }  
+    }
+
     if (millis() - lastTempReadTime >= tempReadInterval) {
         readTemp();
         calAvgTemp();
